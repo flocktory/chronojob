@@ -3,7 +3,7 @@
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/tools.reader "1.0.0-alpha1"]
                  [http-kit "2.1.18"]
                  [prismatic/schema "1.1.0"]
@@ -34,27 +34,38 @@
 
                  [cljs-http "0.1.39"]
                  [org.clojure/clojurescript "1.7.228"]
-                 [rum "0.8.0"]]
+                 [rum "0.8.0"]
+
+                 [javax.xml.bind/jaxb-api "2.3.0"]]
   :jvm-opts ["-Duser.timezone=GMT"]
   :clean-targets ^{:protect false} ["resources/public/js/" "target"]
   :plugins [[lein-figwheel "0.5.2"]
-            [lein-cljsbuild "1.1.3" :exclusions [[org.clojure/clojure]]]]
+            [lein-cljsbuild "1.1.3" :exclusions [[org.clojure/clojure]]]
+            [lein-parent "0.3.5"]
+            [lein-eftest "0.5.4"]]
+  :eftest {:multithread? false}
   :cljsbuild {:builds [{:id "dev"
                         :source-paths ["src/"]
-                        :figwheel {:on-jsload "chronojob.ui/reload-hook" }
+                        :figwheel {:on-jsload "chronojob.ui/reload-hook"}
                         :compiler {:main "chronojob.ui"
                                    :asset-path "/static/js/out"
                                    :output-to "resources/public/static/js/main.js"
-                                   :output-dir "resources/public/static/js/out" } }
+                                   :output-dir "resources/public/static/js/out"}}
                        {:id "prod"
                         :source-paths ["src/"]
                         :compiler {:main "chronojob.ui"
                                    :optimizations :advanced
                                    :asset-path "/static/js/out"
                                    :pretty-print false
-                                   :output-to "resources/public/static/js/main.js"} }]}
+                                   :output-to "resources/public/static/js/main.js"}}]}
   :figwheel {:css-dirs ["resources/public/static/css"]}
   :main chronojob.core
   :profiles {:dev {:dependencies [[reloaded.repl "0.2.1"]]
                    :source-paths ["dev"]}
-             :uberjar {:aot :all}})
+             :uberjar {:aot :all}}
+  :repositories [["releases"
+                  {:url "https://nexus.flocktory.com/nexus/content/repositories/releases/"
+                   :sign-releases false}]
+                 ["snapshots"
+                  {:url "https://nexus.flocktory.com/nexus/content/repositories/snapshots/"
+                   :sign-releases false}]])
