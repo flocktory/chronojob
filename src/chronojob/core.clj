@@ -28,7 +28,10 @@
              [core :as s]
              [utils :as sutils]]
             [com.stuartsierra.component :as component]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [flock.staff
+             [probs :as probes]
+             [metrics :as staff-metrics]])
   (:import io.prometheus.client.exporter.common.TextFormat
            java.io.StringWriter)
   (:gen-class))
@@ -225,8 +228,8 @@
 (defn system
   [file-config]
   (let [components [server worker/worker maintenance/cleaner maintenance/rescue
-                    metrics/metrics]]
-    (defcomponent/system components
+                    metrics/metrics staff-metrics/metrics]]
+    (probes/system-with-probs components
       {:file-config file-config})))
 
 (defn at-shutdown

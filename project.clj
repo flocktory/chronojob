@@ -1,60 +1,80 @@
+;; hack for using http nexus repos
+(require 'cemerick.pomegranate.aether)
+(cemerick.pomegranate.aether/register-wagon-factory!
+  "http" #(org.apache.maven.wagon.providers.http.HttpWagon.))
+
 (defproject chronojob "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
-  :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/tools.reader "1.0.0-alpha1"]
-                 [http-kit "2.1.18"]
-                 [prismatic/schema "1.1.0"]
-                 [prismatic/plumbing "0.5.3"]
-                 [ring/ring-core "1.4.0"]
+  :license {:name "FreeAtLast"}
+  :parent-project {:coords [com.flocktory/staff.root "4.0.5"]
+                   :inherit [:managed-dependencies]}
+  :dependencies [[org.clojure/clojure]
+
+                 [com.flocktory/staff.logging]
+                 [com.flocktory/staff.metrics]
+                 [com.flocktory/staff.probs]
+                 [com.flocktory/staff.sql]
+                 [com.flocktory/staff.config]
+                 [com.flocktory/staff.config]
+                 ;; jaeger почему-то не работает в k8s
+                 [com.flocktory/staff.service "2.4.6-no-jaeger"]
+
+                 [org.clojure/tools.reader]
+                 [http-kit "2.3.0"]
+                 [prismatic/schema]
+                 [prismatic/plumbing]
+                 [ring/ring-core "1.7.1"]
                  [com.grammarly/omniconf "0.2.2"]
-                 [defcomponent "0.1.6"]
+                 [defcomponent]
                  [honeysql "0.6.3"]
                  [org.postgresql/postgresql "9.4.1208.jre7"]
-                 [org.clojure/tools.logging "0.3.1"]
-                 [org.clojure/java.jdbc "0.5.0"]
                  [com.zaxxer/HikariCP "2.4.5"]
                  [bidi "2.0.6"]
                  [ring/ring-json "0.4.0"]
-                 [org.clojure/core.async "0.2.374"
+                 [org.clojure/core.async "0.4.490"
                   :exclusions [org.clojure/tools.reader]]
                  [clj-time "0.11.0"]
 
                  [io.prometheus/simpleclient "0.0.14"]
                  [io.prometheus/simpleclient_common "0.0.14"]
 
-                 [org.slf4j/slf4j-api "1.7.7"]
-                 [ch.qos.logback/logback-classic "1.1.2"]
-                 [org.slf4j/log4j-over-slf4j "1.7.7"]
-                 [org.slf4j/jul-to-slf4j "1.7.7"]
-                 [org.slf4j/jcl-over-slf4j "1.7.7"]
-                 [net.kencochrane.raven/raven-logback "6.0.0"]
+                 ;[org.slf4j/slf4j-api "1.7.7"]
+                 ;[ch.qos.logback/logback-classic "1.1.2"]
+                 ;[org.slf4j/log4j-over-slf4j "1.7.7"]
+                 ;[org.slf4j/jul-to-slf4j "1.7.7"]
+                 ;[org.slf4j/jcl-over-slf4j "1.7.7"]
+                 ;[net.kencochrane.raven/raven-logback "6.0.0"]
 
-                 [cljs-http "0.1.39"]
-                 [org.clojure/clojurescript "1.7.228"]
-                 [rum "0.8.0"]]
+                 [javax.servlet/servlet-api "2.5"]
+                 [javax.xml.bind/jaxb-api "2.3.0"]]
+
   :jvm-opts ["-Duser.timezone=GMT"]
-  :clean-targets ^{:protect false} ["resources/public/js/" "target"]
-  :plugins [[lein-figwheel "0.5.2"]
-            [lein-cljsbuild "1.1.3" :exclusions [[org.clojure/clojure]]]]
-  :cljsbuild {:builds [{:id "dev"
-                        :source-paths ["src/"]
-                        :figwheel {:on-jsload "chronojob.ui/reload-hook" }
-                        :compiler {:main "chronojob.ui"
-                                   :asset-path "/static/js/out"
-                                   :output-to "resources/public/static/js/main.js"
-                                   :output-dir "resources/public/static/js/out" } }
-                       {:id "prod"
-                        :source-paths ["src/"]
-                        :compiler {:main "chronojob.ui"
-                                   :optimizations :advanced
-                                   :asset-path "/static/js/out"
-                                   :pretty-print false
-                                   :output-to "resources/public/static/js/main.js"} }]}
-  :figwheel {:css-dirs ["resources/public/static/css"]}
+
+  :plugins [[lein-parent "0.3.5"]
+            [lein-eftest "0.5.4"]]
+
+  :eftest {:multithread? false}
   :main chronojob.core
-  :profiles {:dev {:dependencies [[reloaded.repl "0.2.1"]]
-                   :source-paths ["dev"]}
-             :uberjar {:aot :all}})
+
+  :source-paths ["src" "spec/src" "dev"]
+  :resource-paths ["resources"]
+
+  :profiles {:repl {:source-paths ["src" "spec/src" "dev"]
+                    :resource-paths ["test/resources" "resources"]
+                    :repl-options {:init-ns user.my}
+                    :dependencies [[org.clojure/tools.namespace "0.2.11"]]
+                    :injections [(require 'clojure.tools.namespace.repl)
+                                 (require 'user.my)]}}
+  :mirrors {"central" {:name "Nexus"
+                       :url "https://nexus.flocktory.com/nexus/content/groups/public/"
+                       :repo-manager true}
+            #"clojars" {:name "Nexus"
+                        :url "https://nexus.flocktory.com/nexus/content/groups/public/"
+                        :repo-manager true}}
+  :repositories [["releases"
+                  {:url "https://nexus.flocktory.com/nexus/content/repositories/releases/"
+                   :sign-releases false}]
+                 ["snapshots"
+                  {:url "https://nexus.flocktory.com/nexus/content/repositories/snapshots/"
+                   :sign-releases false}]])
