@@ -1,5 +1,5 @@
 env:
-  CHARTMAN_VERSION: cbed5885f310a7d2dbfcf4cdb19e9925d0b44d43
+  CHARTMAN_VERSION: fc142b7944246467039a10275ce1dc0a575d0c4e
 
 steps:
   - label: ':docker: Build'
