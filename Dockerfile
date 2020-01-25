@@ -13,4 +13,4 @@ RUN cd /opt/build && \
 
 EXPOSE 7000
 
-CMD /usr/bin/java -cp /opt/:/opt/chronojob-0.1.0-SNAPSHOT-standalone.jar chronojob.core /opt/config.clj
+CMD java -cp /opt/:/opt/chronojob-0.1.0-SNAPSHOT-standalone.jar chronojob.core /opt/config.clj
