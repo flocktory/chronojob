@@ -6,6 +6,9 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  ;; need here latest cheshire for logstash-logback-encoder
                  [cheshire/cheshire "5.9.0"]
+                 ; java.lang.ClassNotFoundException: javax.xml.bind.DatatypeConverter
+                 ; в Java 11
+                 [javax.xml.bind/jaxb-api "2.3.0"]
                  [org.clojure/tools.reader "1.0.0-alpha1"]
                  [http-kit "2.1.18"]
                  [prismatic/schema "1.1.0"]
