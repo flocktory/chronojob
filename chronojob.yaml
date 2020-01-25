@@ -26,9 +26,9 @@ deployment:
       value: "chronojob"
   resources:
     limits:
-      memory: 1Gi
+      memory: 512M
     requests:
-      cpu: 1000m
-      memory: 1Gi
+      cpu: 500m
+      memory: 512M
   nodeSelector:
     flocktory.com/node-type: general

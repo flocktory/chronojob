@@ -39,7 +39,10 @@
                  [cljs-http "0.1.39"]
                  [org.clojure/clojurescript "1.7.228"]
                  [rum "0.8.0"]]
-  :jvm-opts ["-Duser.timezone=GMT"]
+  :jvm-opts ["-Duser.timezone=GMT"
+             "-Dsun.net.inetaddr.ttl=60"
+             "-XX:InitialRAMPercentage=80.0"
+             "-XX:MaxRAMPercentage=80.0"]
   :clean-targets ^{:protect false} ["resources/public/js/" "target"]
   :plugins [[lein-figwheel "0.5.2"]
             [lein-cljsbuild "1.1.3" :exclusions [[org.clojure/clojure]]]]
