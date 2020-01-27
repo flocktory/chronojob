@@ -32,3 +32,6 @@ deployment:
       memory: 512M
   nodeSelector:
     flocktory.com/node-type: general
+
+service:
+  enabled: true
